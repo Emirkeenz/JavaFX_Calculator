@@ -63,7 +63,7 @@ public class CalculatorController {
 
     private void handleDigit(String digit) {
         if (isCalculationComplete) {
-            text.setText(""); // Очистить перед вводом нового числа
+            text.setText("");
             isCalculationComplete = false;
         }
         String val = text.getText();
@@ -126,11 +126,11 @@ public class CalculatorController {
         if (!val.isEmpty()) {
             calc.setOp1(Double.parseDouble(val));
             calc.setOperator(operator);
-            text.setText(""); // Очистить поле для нового операнда
+            text.setText("");
         } else if (operator == '√' || operator == '±') {
-            calc.setOp1(calc.getOp1()); // Сохраняем текущее значение
+            calc.setOp1(calc.getOp1());
             calc.setOperator(operator);
-            calc.calculate(); // Выполняем расчет сразу
+            calc.calculate();
             if (calc.isError()) {
                 text.setText("Error");
             } else {

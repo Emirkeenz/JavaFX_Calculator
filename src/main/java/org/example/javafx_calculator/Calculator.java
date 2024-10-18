@@ -52,18 +52,18 @@ public class Calculator {
                 result = op1 * op2;
                 break;
             case '%':
-                result = op1 * 0.01; // Процент от op1
+                result = op1 * 0.01;
                 break;
             case '√':
                 if (op1 < 0) {
-                    isError = true; // Ошибка, если op1 отрицательный
+                    isError = true;
                     result = 0;
                 } else {
-                    result = Math.sqrt(op1); // Квадратный корень из op1
+                    result = Math.sqrt(op1);
                 }
                 break;
             case '±':
-                result = -op1; // Изменение знака op1
+                result = -op1;
                 break;
             case '/':
                 if (op2 == 0) {
