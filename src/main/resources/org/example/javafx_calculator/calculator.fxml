@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" style="-fx-background-color: #222222; -fx-background-radius: 3;" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.javafx_calculator.CalculatorController">
+<AnchorPane prefHeight="600.0" style="-fx-background-color: #222222; -fx-background-radius: 3;" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.javafx_calculator.CalculatorController">
    <children>
       <TextField fx:id="text" layoutX="12.0" layoutY="14.0" prefHeight="70.0" style="-fx-text-fill: #EEECEA; -fx-background-color: #222222;" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="35.0">
          <font>
