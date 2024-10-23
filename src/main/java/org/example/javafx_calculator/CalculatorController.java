@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import java.util.Stack;
 
 public class CalculatorController {
     Calculator calc = new Calculator();
@@ -112,15 +113,17 @@ public class CalculatorController {
 
     private void handleOperator(char operator) {
         if (isErrorDisplayed) {
-            return; // Не позволяем вводить операторы при отображении ошибки
+            return;
         }
 
         String val = text.getText();
 
-        if (!val.isEmpty()) {
-            calc.setOp1(Double.parseDouble(val));
-            calc.setOperator(operator);
-            text.setText("");
+        if (isCalculationComplete) {
+            isCalculationComplete = false;
+        }
+
+        if (!val.isEmpty() && !val.endsWith(" ")) {
+            text.setText(val + " " + operator + " ");
         }
     }
 
@@ -129,34 +132,80 @@ public class CalculatorController {
         if (isErrorDisplayed) {
             return; // Не позволяем выполнять расчет, пока отображена ошибка
         }
-        String val = text.getText();
+        String expression = text.getText();
         try {
-            if (calc.getOperator() != '\0' && !val.isEmpty()) {
-                calc.setOp2(Double.parseDouble(val));
-                calc.calculate();
-                if (calc.isError()) {
-                    Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setTitle("Error");
-                    a.setHeaderText(null); // Можно убрать заголовок
-                    a.setContentText("Division by zero is not allowed. Please clear the calculator to proceed.");
-                    a.show();
-                    isErrorDisplayed = true;
+            if (!expression.isEmpty()) {
+                double result = calculateExpression(expression);
+
+                // Проверяем, является ли результат целым числом
+                if (result == (int) result) {
+                    text.setText(String.valueOf((int) result)); // Выводим как целое число
                 } else {
-                    double result = calc.getResult();
-                    // Если результат является целым числом, выводим его как целое число
-                    if (result == (int) result) {
-                        text.setText(String.valueOf((int) result));
-                    } else {
-                        text.setText(String.valueOf(result));
-                    }
-                    isCalculationComplete = true;
+                    text.setText(String.valueOf(result)); // Выводим как число с плавающей точкой
                 }
-                calc.reset();
+
+                isCalculationComplete = true;
             }
-        } catch (NumberFormatException e) {
+        } catch (ArithmeticException e) {
             text.setText("Error");
             isErrorDisplayed = true;
         }
+    }
+
+    private double calculateExpression(String expression) {
+        Stack<Double> operands = new Stack<>();
+        Stack<Character> operators = new Stack<>();
+
+        for (int i = 0; i < expression.length(); i++) {
+            char ch = expression.charAt(i);
+
+            if (ch == ' ') continue;
+
+            if (Character.isDigit(ch) || ch == '.') {
+                StringBuilder sb = new StringBuilder();
+                while (i < expression.length() && (Character.isDigit(expression.charAt(i)) || expression.charAt(i) == '.')) {
+                    sb.append(expression.charAt(i));
+                    i++;
+                }
+                i--;
+                operands.push(Double.parseDouble(sb.toString()));
+            } else if (ch == '(') {
+                operators.push(ch);
+            } else if (ch == ')') {
+                while (operators.peek() != '(') {
+                    operands.push(applyOperation(operators.pop(), operands.pop(), operands.pop()));
+                }
+                operators.pop();
+            } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/') {
+                while (!operators.isEmpty() && hasPrecedence(ch, operators.peek())) {
+                    operands.push(applyOperation(operators.pop(), operands.pop(), operands.pop()));
+                }
+                operators.push(ch);
+            }
+        }
+
+        while (!operators.isEmpty()) {
+            operands.push(applyOperation(operators.pop(), operands.pop(), operands.pop()));
+        }
+
+        return operands.pop();
+    }
+
+    private boolean hasPrecedence(char op1, char op2) {
+        if (op2 == '(' || op2 == ')') return false;
+        if ((op1 == '*' || op1 == '/') && (op2 == '+' || op2 == '-')) return false;
+        return true;
+    }
+
+    private double applyOperation(char op, double b, double a) {
+        switch (op) {
+            case '+': return a + b;
+            case '-': return a - b;
+            case '*': return a * b;
+            case '/': if (b == 0) throw new ArithmeticException("Cannot divide by zero");
+                return a / b;
+        }
+        return 0;
     }
 
     @FXML
@@ -257,4 +306,66 @@ public class CalculatorController {
         }
     }
 
+    @FXML
+    private void onClickOpenBracket() {
+        if (isErrorDisplayed) {
+            return;
+        }
+
+        String val = text.getText();
+        if (isCalculationComplete) {
+            text.setText("(");
+            isCalculationComplete = false;
+        } else {
+            text.setText(val + "(");
+        }
+    }
+
+    @FXML
+    private void onClickCloseBracket() {
+        if (isErrorDisplayed) {
+            return; // Не позволяем вводить скобки при отображении ошибки
+        }
+
+        String val = text.getText();
+        if (!val.isEmpty()) {
+            text.setText(val + ")");
+        }
+    }
+
+    @FXML
+    private void onClickBackspace() {
+        if (isErrorDisplayed) {
+            return;
+        }
+        String currentText = text.getText();
+
+        if (!currentText.isEmpty()) {
+            text.setText(currentText.substring(0, currentText.length() - 1));
+        }
+    }
+
+    @FXML
+    protected void onExitMenuClick() {
+        System.exit(0);
+    }
+
+    @FXML
+    protected void onHelpMenuClick() {
+        Alert helpAlert = new Alert(Alert.AlertType.INFORMATION);
+        helpAlert.setTitle("Help");
+        helpAlert.setHeaderText("How to Use the Calculator");
+        helpAlert.setContentText("This program allows you to perform basic arithmetic operations and additional functions.\n\n" +
+                "1. Enter the numbers you want to use in calculations.\n" +
+                "2. Choose the desired arithmetic operation (addition, subtraction, multiplication, division).\n" +
+                "3. Use the following functions:\n" +
+                "   - Square Root: to calculate the square root of a number.\n" +
+                "   - Percentage: to calculate percentages.\n" +
+                "   - Absolute Value: to get the absolute value of a number.\n" +
+                "   - Parentheses: to change the order of operations.\n" +
+                "4. Click 'Equals' to get the result.\n" +
+                "5. Use the 'Clear' option to reset inputs or 'Backspace' to delete the last character.\n" +
+                "6. Select 'Exit' to close the application.");
+        helpAlert.showAndWait();
+    }
 }
