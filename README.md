@@ -23,9 +23,7 @@
 
 # UI Screenshots
 *(Insert screenshots showing examples of basic operations, an error for division by zero, and the clear functionality)*
-<img width="408" alt="Снимок экрана 2024-10-19 в 17 13 14" src="https://github.com/user-attachments/assets/c3b07093-ccaf-40f7-83c6-eea001ffe443">
-
-<img width="420" alt="Снимок экрана 2024-10-19 в 17 13 39" src="https://github.com/user-attachments/assets/29d2bdb1-2bb0-410f-a2b8-2093ceb5ac43">
+<img width="405" alt="Снимок экрана 2024-10-24 в 01 46 22" src="https://github.com/user-attachments/assets/4082ab56-da47-489e-9e06-83f588e4e7d9">
 
 # Special Instructions & Known Issues
 
